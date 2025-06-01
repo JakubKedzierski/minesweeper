@@ -1,2 +1,3 @@
 .vscode/launch.json
-__debug_bin1412626102.exe
+__debug_bin*
+build/*
