@@ -1,16 +1,15 @@
 package uicontroller
 
-import "minesweeper/config"
+//import "minesweeper/config"
+import "minesweeper/gamelogic"
 
 type UiState struct {
-	visible      [config.BOARD_HEIGHT][config.BOARD_WIDTH]bool
-	tickedByUser [config.BOARD_HEIGHT][config.BOARD_WIDTH]bool
 }
 
 func GetInput() (uint, uint) {
 	return 0, 0
 }
 
-func RenderBoard() {
+func RenderBoard(gamestate gamelogic.GameState, uiState *UiState) {
 
 }
