@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"github.com/faiface/pixel"
-	"github.com/faiface/pixel/imdraw"
 	"github.com/faiface/pixel/pixelgl"
 	"golang.org/x/image/colornames"
 )
@@ -63,25 +62,18 @@ func GetInput() (uint, uint) {
 func RenderBoard(gamestate gamelogic.GameState, uiState *UiState) {
 	uiState.Win.Clear(colornames.Lightgray)
 
-	spriteRect := pixel.R(32, 64, 64, 96) // sprite location in pixels
-	sprite := pixel.NewSprite(uiState.Sprites, spriteRect)
-	sprite.Draw(uiState.Win, pixel.IM.Moved(uiState.Win.Bounds().Center()))
-
-	imd := imdraw.New(nil)
-	imd.Color = colornames.Black
+	const SPRITES_Y_FLIP = 704
+	const SCALE_BOX_SPRITE = 1.2
+	boxSpriteRect := pixel.R(15, SPRITES_Y_FLIP-211, 32, SPRITES_Y_FLIP-194) // boxSprite location in pixels
+	boxSprite := pixel.NewSprite(uiState.Sprites, boxSpriteRect)
 
 	for x := range config.BOARD_WIDTH {
 		for y := range config.BOARD_HEIGHT {
-			bottomLeftCornerX := float64(x + x*config.RECT_WIDTH + config.GUBARDBAND/2)
-			bottomLeftCornerY := float64(y + y*config.RECT_HEIGHT + config.GUBARDBAND/2)
-			topRightCornerX := bottomLeftCornerX + config.RECT_WIDTH
-			topRightCornerY := bottomLeftCornerY + config.RECT_HEIGHT
+			bottomLeftCornerX := float64(x + x*int(boxSpriteRect.W()*SCALE_BOX_SPRITE) + config.GUBARDBAND/2)
+			bottomLeftCornerY := float64(y + y*int(boxSpriteRect.H()*SCALE_BOX_SPRITE) + config.GUBARDBAND/2)
 
-			imd.Push(pixel.V(bottomLeftCornerX, bottomLeftCornerY), pixel.V(topRightCornerX, topRightCornerY))
-			imd.Rectangle(config.RECT_LINE_WIDTH)
+			movLoc := pixel.Vec{X: bottomLeftCornerX, Y: bottomLeftCornerY}
+			boxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE_BOX_SPRITE).Moved(movLoc))
 		}
 	}
-
-	imd.Polygon(0)
-	imd.Draw(uiState.Win)
 }
