@@ -55,8 +55,12 @@ func loadSpritesPicture(path string) (pixel.Picture, error) {
 	return pixel.PictureDataFromImage(img), nil
 }
 
-func GetInput() (uint, uint) {
-	return 0, 0
+func GetInput(uiState *UiState) (bool, uint, uint) {
+	if uiState.Win.JustPressed(pixelgl.MouseButtonLeft) {
+		mousePos := uiState.Win.MousePosition()
+		return true, uint(mousePos.X), uint(mousePos.Y)
+	}
+	return false, 0, 0
 }
 
 func RenderBoard(gamestate gamelogic.GameState, uiState *UiState) {
@@ -64,16 +68,37 @@ func RenderBoard(gamestate gamelogic.GameState, uiState *UiState) {
 
 	const SPRITES_Y_FLIP = 704
 	const SCALE_BOX_SPRITE = 1.2
-	boxSpriteRect := pixel.R(15, SPRITES_Y_FLIP-211, 32, SPRITES_Y_FLIP-194) // boxSprite location in pixels
+	const SPRITE_WIDTH = 16
+	boxSpriteRect := pixel.R(15, SPRITES_Y_FLIP-211, 15+SPRITE_WIDTH, SPRITES_Y_FLIP-194) // boxSprite location in pixels
 	boxSprite := pixel.NewSprite(uiState.Sprites, boxSpriteRect)
+
+	tickedBoxRect := pixel.R(31, SPRITES_Y_FLIP-211, 31+SPRITE_WIDTH, SPRITES_Y_FLIP-194)
+	tickedBoxSprite := pixel.NewSprite(uiState.Sprites, tickedBoxRect)
+
+	flagBoxRect := pixel.R(48, SPRITES_Y_FLIP-211, 48+SPRITE_WIDTH, SPRITES_Y_FLIP-194)
+	flagSprite := pixel.NewSprite(uiState.Sprites, flagBoxRect)
+
+	const NUMBERS_COUNT = 8
+	var numbersSprites [NUMBERS_COUNT]*pixel.Sprite
+	for i := 0; i < NUMBERS_COUNT; i++ {
+		numbersRect := pixel.R(15+float64(i*(SPRITE_WIDTH+1)), SPRITES_Y_FLIP-227, 31+float64(i*(SPRITE_WIDTH+1)), SPRITES_Y_FLIP-211)
+		numbersSprites[i] = pixel.NewSprite(uiState.Sprites, numbersRect)
+	}
 
 	for x := range config.BOARD_WIDTH {
 		for y := range config.BOARD_HEIGHT {
 			bottomLeftCornerX := float64(x + x*int(boxSpriteRect.W()*SCALE_BOX_SPRITE) + config.GUBARDBAND/2)
 			bottomLeftCornerY := float64(y + y*int(boxSpriteRect.H()*SCALE_BOX_SPRITE) + config.GUBARDBAND/2)
-
 			movLoc := pixel.Vec{X: bottomLeftCornerX, Y: bottomLeftCornerY}
+
+			// choose sprite to draw based on game state:
+
+			tickedBoxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE_BOX_SPRITE).Moved(movLoc))
 			boxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE_BOX_SPRITE).Moved(movLoc))
+			numbersSprites[7].Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE_BOX_SPRITE).Moved(movLoc))
+			flagSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE_BOX_SPRITE).Moved(movLoc))
 		}
 	}
+
+	uiState.Win.Update()
 }

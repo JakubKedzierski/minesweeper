@@ -9,6 +9,6 @@ type GameState struct {
 	tickedByUser          [config.BOARD_HEIGHT][config.BOARD_WIDTH]bool
 }
 
-func TickBox(gameState *GameState, x uint, y uint){
-	
+func UpdateLogic(gameState *GameState, x uint, y uint) {
+
 }
