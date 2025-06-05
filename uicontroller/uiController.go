@@ -58,7 +58,19 @@ func loadSpritesPicture(path string) (pixel.Picture, error) {
 func GetInput(uiState *UiState) (bool, uint, uint) {
 	if uiState.Win.JustPressed(pixelgl.MouseButtonLeft) {
 		mousePos := uiState.Win.MousePosition()
-		return true, uint(mousePos.X), uint(mousePos.Y)
+		if mousePos.X < config.BOX_LEN || mousePos.Y < config.BOX_LEN {
+			return false, 0, 0
+		}
+
+		mousePos.X -= (config.BOX_LEN)
+		mousePos.Y -= (config.BOX_LEN)
+
+		xBox := mousePos.X / config.BOX_LEN
+		yBox := mousePos.Y / config.BOX_LEN
+
+		if xBox < config.BOARD_WIDTH && yBox < config.BOARD_HEIGHT {
+			return true, uint(xBox), uint(yBox)
+		}
 	}
 	return false, 0, 0
 }
@@ -67,36 +79,39 @@ func RenderBoard(gamestate gamelogic.GameState, uiState *UiState) {
 	uiState.Win.Clear(colornames.Lightgray)
 
 	const SPRITES_Y_FLIP = 704
-	const SCALE_BOX_SPRITE = 1.2
-	const SPRITE_WIDTH = 16
-	boxSpriteRect := pixel.R(15, SPRITES_Y_FLIP-211, 15+SPRITE_WIDTH, SPRITES_Y_FLIP-194) // boxSprite location in pixels
+	const SPRITE_BOX_LEN = 16
+	const SCALE = config.BOX_LEN / SPRITE_BOX_LEN
+
+	const Y_LINE = SPRITES_Y_FLIP - 211
+	boxSpriteRect := pixel.R(15, Y_LINE, 15+SPRITE_BOX_LEN, Y_LINE+SPRITE_BOX_LEN) // boxSprite location in pixels
 	boxSprite := pixel.NewSprite(uiState.Sprites, boxSpriteRect)
 
-	tickedBoxRect := pixel.R(31, SPRITES_Y_FLIP-211, 31+SPRITE_WIDTH, SPRITES_Y_FLIP-194)
+	tickedBoxRect := pixel.R(31, Y_LINE, 31+SPRITE_BOX_LEN, Y_LINE+SPRITE_BOX_LEN)
 	tickedBoxSprite := pixel.NewSprite(uiState.Sprites, tickedBoxRect)
 
-	flagBoxRect := pixel.R(48, SPRITES_Y_FLIP-211, 48+SPRITE_WIDTH, SPRITES_Y_FLIP-194)
+	flagBoxRect := pixel.R(48, Y_LINE, 48+SPRITE_BOX_LEN, SPRITES_Y_FLIP-194)
 	flagSprite := pixel.NewSprite(uiState.Sprites, flagBoxRect)
 
 	const NUMBERS_COUNT = 8
 	var numbersSprites [NUMBERS_COUNT]*pixel.Sprite
 	for i := 0; i < NUMBERS_COUNT; i++ {
-		numbersRect := pixel.R(15+float64(i*(SPRITE_WIDTH+1)), SPRITES_Y_FLIP-227, 31+float64(i*(SPRITE_WIDTH+1)), SPRITES_Y_FLIP-211)
+		leftVtx := 15 + float64(i*(SPRITE_BOX_LEN+1))
+		numbersRect := pixel.R(leftVtx, SPRITES_Y_FLIP-227, leftVtx+SPRITE_BOX_LEN, SPRITES_Y_FLIP-211)
 		numbersSprites[i] = pixel.NewSprite(uiState.Sprites, numbersRect)
 	}
 
 	for x := range config.BOARD_WIDTH {
 		for y := range config.BOARD_HEIGHT {
-			bottomLeftCornerX := float64(x + x*int(boxSpriteRect.W()*SCALE_BOX_SPRITE) + config.GUBARDBAND/2)
-			bottomLeftCornerY := float64(y + y*int(boxSpriteRect.H()*SCALE_BOX_SPRITE) + config.GUBARDBAND/2)
+			bottomLeftCornerX := float64(x*config.BOX_LEN + config.GUBARDBAND/2)
+			bottomLeftCornerY := float64(y*config.BOX_LEN + config.GUBARDBAND/2)
 			movLoc := pixel.Vec{X: bottomLeftCornerX, Y: bottomLeftCornerY}
 
 			// choose sprite to draw based on game state:
 
-			tickedBoxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE_BOX_SPRITE).Moved(movLoc))
-			boxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE_BOX_SPRITE).Moved(movLoc))
-			numbersSprites[7].Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE_BOX_SPRITE).Moved(movLoc))
-			flagSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE_BOX_SPRITE).Moved(movLoc))
+			boxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
+			flagSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
+			numbersSprites[7].Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
+			tickedBoxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
 		}
 	}
 

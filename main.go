@@ -3,7 +3,6 @@ package main
 import (
 	"minesweeper/gamelogic"
 	"minesweeper/uicontroller"
-
 	"github.com/faiface/pixel/pixelgl"
 )
 
