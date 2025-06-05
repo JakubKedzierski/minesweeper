@@ -95,6 +95,9 @@ func RenderBoard(gameState gamelogic.GameState, uiState *UiState) {
 	tickedBoxRect := pixel.R(31, Y_LINE, 31+SPRITE_BOX_LEN, Y_LINE+SPRITE_BOX_LEN)
 	tickedBoxSprite := pixel.NewSprite(uiState.Sprites, tickedBoxRect)
 
+	bombRect := pixel.R(116, Y_LINE, 116+SPRITE_BOX_LEN, Y_LINE+SPRITE_BOX_LEN)
+	bombSprite := pixel.NewSprite(uiState.Sprites, bombRect)
+
 	flagBoxRect := pixel.R(48, Y_LINE, 48+SPRITE_BOX_LEN, SPRITES_Y_FLIP-194)
 	flagSprite := pixel.NewSprite(uiState.Sprites, flagBoxRect)
 
@@ -119,11 +122,18 @@ func RenderBoard(gameState gamelogic.GameState, uiState *UiState) {
 				if gameState.Flags[y][x] {
 					flagSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
 				} else {
-					numbersSprites[7].Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
-					tickedBoxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
+					if gameState.Bombs[y][x] {
+						bombSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
+					} else {
+						count := gameState.SurroundingBombsCount[y][x]
+						if count == 0 {
+							tickedBoxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
+						} else {
+							numbersSprites[count-1].Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
+						}
+					}
 				}
 			}
-
 		}
 	}
 

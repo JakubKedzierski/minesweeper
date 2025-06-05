@@ -1,6 +1,7 @@
 package gamelogic
 
 import (
+	"math/rand/v2"
 	"minesweeper/config"
 )
 
@@ -22,11 +23,19 @@ const (
 )
 
 func InitGameState(gameState *GameState) {
-
+	for range config.BOMB_COUNT {
+		x := rand.IntN(config.BOARD_WIDTH)
+		y := rand.IntN(config.BOARD_HEIGHT)
+		for gameState.Bombs[y][x] {
+			x = rand.IntN(config.BOARD_WIDTH)
+			y = rand.IntN(config.BOARD_HEIGHT)
+		}
+		gameState.Bombs[y][x] = true
+	}
 }
 
 func UpdateLogic(gameState *GameState, x uint, y uint, userInput UserInput) {
-	if gameState.Visible[y][x] {
+	if gameState.Visible[y][x] && !gameState.Flags[y][x] {
 		return
 	}
 
@@ -35,6 +44,8 @@ func UpdateLogic(gameState *GameState, x uint, y uint, userInput UserInput) {
 		gameState.Flags[y][x] = true
 		return
 	}
+
+	gameState.Flags[y][x] = false
 
 	if gameState.Bombs[y][x] {
 		gameState.GameOver = true
