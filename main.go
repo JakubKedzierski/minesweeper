@@ -3,10 +3,15 @@ package main
 import (
 	"minesweeper/gamelogic"
 	"minesweeper/uicontroller"
+
 	"github.com/faiface/pixel/pixelgl"
 )
 
 func run() {
+
+	// TODO:
+	// - uncover empty boxes surrounding ticked box
+	// - handle game over and game won
 
 	uiState := uicontroller.UiState{}
 	gameState := gamelogic.GameState{}
