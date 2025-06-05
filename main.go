@@ -14,9 +14,9 @@ func run() {
 	gamelogic.InitGameState(&gameState)
 
 	for !uiState.Win.Closed() {
-		boxTicked, x, y := uicontroller.GetInput(&uiState)
-		if boxTicked {
-			gamelogic.UpdateLogic(&gameState, x, y)
+		userInput, x, y := uicontroller.GetInput(&uiState)
+		if userInput != gamelogic.NoInput {
+			gamelogic.UpdateLogic(&gameState, x, y, userInput)
 		}
 		uicontroller.RenderBoard(gameState, &uiState)
 	}

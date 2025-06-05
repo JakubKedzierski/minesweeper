@@ -55,11 +55,13 @@ func loadSpritesPicture(path string) (pixel.Picture, error) {
 	return pixel.PictureDataFromImage(img), nil
 }
 
-func GetInput(uiState *UiState) (bool, uint, uint) {
-	if uiState.Win.JustPressed(pixelgl.MouseButtonLeft) {
+func GetInput(uiState *UiState) (gamelogic.UserInput, uint, uint) {
+	leftPressed := uiState.Win.JustPressed(pixelgl.MouseButtonLeft)
+	rightPressed := uiState.Win.JustPressed(pixelgl.MouseButtonRight)
+	if leftPressed || rightPressed {
 		mousePos := uiState.Win.MousePosition()
 		if mousePos.X < config.BOX_LEN || mousePos.Y < config.BOX_LEN {
-			return false, 0, 0
+			return gamelogic.NoInput, 0, 0
 		}
 
 		mousePos.X -= (config.BOX_LEN)
@@ -69,10 +71,14 @@ func GetInput(uiState *UiState) (bool, uint, uint) {
 		yBox := mousePos.Y / config.BOX_LEN
 
 		if xBox < config.BOARD_WIDTH && yBox < config.BOARD_HEIGHT {
-			return true, uint(xBox), uint(yBox)
+			if leftPressed {
+				return gamelogic.TickBox, uint(xBox), uint(yBox)
+			} else {
+				return gamelogic.Flag, uint(xBox), uint(yBox)
+			}
 		}
 	}
-	return false, 0, 0
+	return gamelogic.NoInput, 0, 0
 }
 
 func RenderBoard(gameState gamelogic.GameState, uiState *UiState) {
@@ -110,9 +116,12 @@ func RenderBoard(gameState gamelogic.GameState, uiState *UiState) {
 			if !gameState.Visible[y][x] {
 				boxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
 			} else {
-				flagSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
-				numbersSprites[7].Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
-				tickedBoxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
+				if gameState.Flags[y][x] {
+					flagSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
+				} else {
+					numbersSprites[7].Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
+					tickedBoxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
+				}
 			}
 
 		}
