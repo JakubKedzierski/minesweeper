@@ -75,7 +75,7 @@ func GetInput(uiState *UiState) (bool, uint, uint) {
 	return false, 0, 0
 }
 
-func RenderBoard(gamestate gamelogic.GameState, uiState *UiState) {
+func RenderBoard(gameState gamelogic.GameState, uiState *UiState) {
 	uiState.Win.Clear(colornames.Lightgray)
 
 	const SPRITES_Y_FLIP = 704
@@ -107,11 +107,14 @@ func RenderBoard(gamestate gamelogic.GameState, uiState *UiState) {
 			movLoc := pixel.Vec{X: bottomLeftCornerX, Y: bottomLeftCornerY}
 
 			// choose sprite to draw based on game state:
+			if !gameState.Visible[y][x] {
+				boxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
+			} else {
+				flagSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
+				numbersSprites[7].Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
+				tickedBoxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
+			}
 
-			boxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
-			flagSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
-			numbersSprites[7].Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
-			tickedBoxSprite.Draw(uiState.Win, pixel.IM.Scaled(pixel.ZV, SCALE).Moved(movLoc))
 		}
 	}
 

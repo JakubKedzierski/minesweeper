@@ -11,6 +11,7 @@ func run() {
 	uiState := uicontroller.UiState{}
 	gameState := gamelogic.GameState{}
 	uicontroller.InitWindow(&uiState)
+	gamelogic.InitGameState(&gameState)
 
 	for !uiState.Win.Closed() {
 		boxTicked, x, y := uicontroller.GetInput(&uiState)
