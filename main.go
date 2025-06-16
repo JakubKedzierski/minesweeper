@@ -10,7 +10,6 @@ import (
 func run() {
 
 	// TODO:
-	// - uncover empty boxes surrounding ticked box
 	// - handle game over and game won
 
 	uiState := uicontroller.UiState{}

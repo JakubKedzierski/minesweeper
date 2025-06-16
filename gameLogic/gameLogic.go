@@ -86,17 +86,60 @@ func UpdateLogic(gameState *GameState, x uint, y uint, userInput UserInput) {
 	if gameState.Bombs[y][x] {
 		gameState.GameOver = true
 	} else {
-		// check if game is over and user won
-		for x := range config.BOARD_WIDTH {
-			for y := range config.BOARD_HEIGHT {
-				if gameState.Bombs[y][x] {
-					continue
-				} else if !gameState.Visible[y][x] {
-					return
-				}
+		gameState.GameWon = checkGameWin(gameState)
+
+		if !gameState.GameWon {
+			uncoverEmptyBoxes(gameState, x, y)
+		}
+	}
+}
+
+func checkGameWin(gameState *GameState) bool {
+	for x := range config.BOARD_WIDTH {
+		for y := range config.BOARD_HEIGHT {
+			if gameState.Bombs[y][x] {
+				continue
+			} else if !gameState.Visible[y][x] {
+				return false
 			}
 		}
+	}
 
-		gameState.GameWon = true
+	return true
+}
+
+func uncoverEmptyBoxes(gameState *GameState, x, y uint) {
+	type Dir struct {
+		dx int
+		dy int
+	}
+
+	directions := [...]Dir{
+		{-1, 0},
+		{1, 0},
+		{0, -1},
+		{0, 1},
+	}
+
+	for _, direction := range directions {
+		neighbourX := int(x) + direction.dx
+		neighbourY := int(y) + direction.dy
+		if neighbourX < 0 || neighbourX >= config.BOARD_WIDTH {
+			continue
+		}
+
+		if neighbourY < 0 || neighbourY >= config.BOARD_HEIGHT {
+			continue
+		}
+
+		if gameState.Visible[neighbourY][neighbourX]{
+			continue
+		} 
+		
+		if !gameState.Bombs[neighbourY][neighbourX] &&
+			gameState.SurroundingBombsCount[neighbourY][neighbourX] == 0 {
+			gameState.Visible[neighbourY][neighbourX] = true
+			uncoverEmptyBoxes(gameState, uint(neighbourX), uint(neighbourY))
+		}
 	}
 }
