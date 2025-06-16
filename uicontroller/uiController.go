@@ -10,6 +10,7 @@ import (
 
 	"github.com/faiface/pixel"
 	"github.com/faiface/pixel/pixelgl"
+	"github.com/gen2brain/dlgs"
 	"golang.org/x/image/colornames"
 )
 
@@ -138,4 +139,18 @@ func RenderBoard(gameState gamelogic.GameState, uiState *UiState) {
 	}
 
 	uiState.Win.Update()
+}
+
+func ShowEndMessage(gameState *gamelogic.GameState) {
+	if gameState.GameWon {
+		_, err := dlgs.Info("Minesweeper", "You won the game!")
+		if err != nil {
+			panic(err)
+		}
+	} else if gameState.GameOver {
+		_, err := dlgs.Info("Minesweeper", "Game Over")
+		if err != nil {
+			panic(err)
+		}
+	}
 }

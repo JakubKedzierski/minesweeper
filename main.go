@@ -23,6 +23,11 @@ func run() {
 			gamelogic.UpdateLogic(&gameState, x, y, userInput)
 		}
 		uicontroller.RenderBoard(gameState, &uiState)
+
+		if gameState.GameWon || gameState.GameOver {
+			uicontroller.ShowEndMessage(&gameState)
+			break
+		}
 	}
 }
 
