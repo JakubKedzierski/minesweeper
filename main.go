@@ -8,10 +8,6 @@ import (
 )
 
 func run() {
-
-	// TODO:
-	// - handle game over and game won
-
 	uiState := uicontroller.UiState{}
 	gameState := gamelogic.GameState{}
 	uicontroller.InitWindow(&uiState)
